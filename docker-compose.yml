@@ -1,0 +1,25 @@
+version: '2.4'
+
+
+services:
+  db:
+    image: postgres:13
+    hostname: postgres
+    command: ["postgres", "-c", "log_statement=all"]
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: woc
+    ports:
+      - 5434:5432
+    restart: always
+    volumes:
+      - ../workout_calendar_data/woc_db:/var/lib/postgresql/data
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      DB_URL: postgresql://user:password@db:5432/woc
+
+

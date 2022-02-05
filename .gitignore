@@ -1,0 +1,6 @@
+.env
+__pycache__
+.idea
+.local
+.cache
+.bash_history
