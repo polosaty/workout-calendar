@@ -3,12 +3,12 @@ import sqlalchemy as sa
 import uvicorn as uvicorn
 from fastapi import FastAPI
 
-from pydantic import BaseModel
 from sqlalchemy.orm import joinedload
 
 from src.db import async_session
 from src.db.models import Day
 from src.db.models import DayORM
+from src import auth
 
 app = FastAPI()
 
@@ -23,6 +23,8 @@ async def read_notes():
         days = Day.from_orms(res)
     return days
 
+
+app.include_router(auth.router)
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host="0.0.0.0", port=8000, reload=True)
