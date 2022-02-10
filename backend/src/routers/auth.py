@@ -34,7 +34,7 @@ async def auth(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessio
 async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     db_user = await users_utils.get_user_by_name(name=user.name, db=db)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="User name already registered")
     user = await users_utils.create_user(user=user, db=db)
     await db.commit()
     return user
