@@ -13,11 +13,14 @@ from src.db import BaseORM
 
 
 class TokenBase(BaseModel):
-    token: UUID4
+    access_token: UUID4
     expires: datetime
     token_type: Optional[str] = "bearer"
 
-    @validator("token")
+    class Config:
+        orm_mode = True
+
+    @validator("access_token")
     def hexlify_token(cls, value):
         """ Конвертирует UUID в hex строку """
         return value.hex
@@ -42,24 +45,33 @@ class UserBase(BaseModel):
     id: int
     name: str
 
+    class Config:
+        orm_mode = True
+
 
 class UserCreate(BaseModel):
     """ Validate request data """
     name: str
     password: str
 
+    class Config:
+        orm_mode = True
 
-class User(UserBase):
+
+class UserWithToken(UserBase):
     """ Return detailed response data with token """
     token: TokenBase = {}
+
+    class Config:
+        orm_mode = True
 
 
 class TokenORM(BaseORM):
     __tablename__ = "token"
 
     id = sa.Column("id", sa.Integer, primary_key=True)
-    token = sa.Column(
-        "token",
+    access_token = sa.Column(
+        "access_token",
         UUID(as_uuid=False),
         server_default=sa.text("uuid_generate_v4()"),
         unique=True,

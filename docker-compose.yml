@@ -19,8 +19,17 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
+    command: python main.py --reload
     environment:
       DB_URL: postgresql://user:password@db:5432/woc
+      ASYNC_DB_URL: postgresql+asyncpg://user:password@db:5432/woc
+    volumes:
+      - ./backend:/app
+    ports:
+      - "127.0.0.1:8081:8000"
+    depends_on:
+      - db
+
 
   front:
     build:

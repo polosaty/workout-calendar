@@ -1,16 +1,18 @@
-from typing import Iterable
-from typing import Optional
-
-import sqlalchemy as sa
 import hashlib
 import random
 import string
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
+from typing import Optional
+
+import sqlalchemy as sa
 from sqlalchemy import and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.models.auth import TokenORM, UserORM
-from src.db.models.auth import User, UserCreate
+from src.db.models import TokenBase
+from src.db.models.auth import TokenORM
+from src.db.models.auth import UserCreate
+from src.db.models.auth import UserORM
 
 
 def get_random_string(length=12):
@@ -38,11 +40,11 @@ async def get_user_by_name(name: str, db: AsyncSession) -> Optional[UserORM]:
     return (await db.execute(query)).scalar_one_or_none()
 
 
-async def get_user_by_token(token: str, db: AsyncSession) -> Optional[TokenORM]:
+async def get_user_by_token(token: str, db: AsyncSession) -> Optional[UserORM]:
     """ Возвращает информацию о владельце указанного токена """
-    query = sa.select(TokenORM).join(UserORM).where(
+    query = sa.select(UserORM).join(TokenORM).where(
         and_(
-            TokenORM.token == token,
+            TokenORM.access_token == token,
             TokenORM.expires > datetime.utcnow()
         )
     )
@@ -54,7 +56,7 @@ async def create_user_token(user_id: int, db: AsyncSession) -> TokenORM:
     query = (
         sa.insert(TokenORM)
         .values(expires=datetime.utcnow() + timedelta(weeks=2), user_id=user_id)
-        .returning(TokenORM.token, TokenORM.expires)
+        .returning(TokenORM.access_token, TokenORM.expires)
     )
 
     return (await db.execute(query)).fetchone()
@@ -69,6 +71,6 @@ async def create_user(user: UserCreate, db: AsyncSession):
     ).returning(UserORM.id))
     user_id = (await db.execute(query)).scalar()
     token = await create_user_token(user_id, db)
-    token_dict = {"token": token.token, "expires": token.expires}
+    token_dict = TokenBase.from_orm(token)
 
     return {**user.dict(), "id": user_id, "is_active": True, "token": token_dict}
