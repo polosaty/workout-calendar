@@ -30,7 +30,7 @@ class UserORM(BaseORM):
     __tablename__ = "user"
 
     id = sa.Column("id", sa.Integer, primary_key=True)
-    name = sa.Column("name", sa.String(100))
+    name = sa.Column("name", sa.String(100), unique=True)
     hashed_password = sa.Column("hashed_password", sa.String())
     is_active = sa.Column(
         "is_active",
@@ -79,7 +79,7 @@ class TokenORM(BaseORM):
         index=True,
     )
     expires = sa.Column("expires", sa.DateTime())
-    user_id = sa.Column("user_id", sa.ForeignKey("user.id"))
+    user_id = sa.Column("user_id", sa.ForeignKey("user.id", ondelete='CASCADE'))
     user = relationship(
         "UserORM", uselist=False,
         backref=backref("tokens", lazy='noload'),

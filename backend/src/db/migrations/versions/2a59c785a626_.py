@@ -44,7 +44,9 @@ def upgrade():
         training_day_type,
         [
             {'id': 1, 'name': 'Пресс', 'details': {}},
-            {'id': 2, 'name': 'Время', 'details': {'order': ['стенка', 'книжка', 'лодочка']}},
+            {'id': 2, 'name': 'Время', 'details': {"subtypes": [{"id": 1, "name": "стенка"},
+                                                                {"id": 2, "name": "книжка"},
+                                                                {"id": 3, "name": "лодочка"}]}},
         ]
     )
 

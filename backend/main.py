@@ -1,18 +1,11 @@
-from typing import List
+import uvicorn
 
-import sqlalchemy as sa
-import uvicorn as uvicorn
-from fastapi import Depends
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
-from src.db.deps import get_db
-from src.db.models import Day
-from src.db.models import DayORM
 from src.routers import auth
+from src.routers import calendar
 from src.routers import users
 
 app = FastAPI()
@@ -34,18 +27,9 @@ async def index():
     return Index()
 
 
-@app.get("/days/", response_model=List[Day])
-async def read_notes(db: AsyncSession = Depends(get_db)):
-    # days = [{'date': '2022-01-28T00:00:02+00', 'training_day_type': {'name': 'Вс', 'details': {}}}]
-    res = (await db.execute(
-        sa.select(DayORM).options(joinedload(DayORM.training_day_type)))
-    ).scalars()
-    days = Day.from_orms(res)
-    return days
-
-
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(calendar.router)
 
 
 if __name__ == '__main__':

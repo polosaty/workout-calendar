@@ -19,16 +19,13 @@ export default {
       try {
          await this.$store.dispatch('viewMe');
       } catch (error) {
-          console.log(error);
-          console.log(error);
-          console.log(error);
-          console.log(error);
+          console.error(error);
           await this.$router.push('/login');
       }
 
   },
   computed: {
-    ...mapGetters({user: 'stateUser' }),
+    ...mapGetters({user: 'stateUser', token: 'stateToken' }),
   },
   // methods: {
   //   ...mapActions(['deleteUser']),
