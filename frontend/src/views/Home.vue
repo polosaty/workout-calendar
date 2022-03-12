@@ -3,7 +3,7 @@
     <p>This site is built with FastAPI and Vue.</p>
 
     <div v-if="isLoggedIn" id="logout">
-      <p id="logout">Click <a href="/board">here</a> to view days.</p>
+      <p id="logout">Click <a href="/">here</a> to view days.</p>
     </div>
     <p v-else>
       <span><a href="/register">Register</a></span>

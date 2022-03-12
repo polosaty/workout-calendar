@@ -27,13 +27,16 @@ class Index(BaseModel):
 
 
 @app.get("/")
+@app.get("/login")
+@app.get("/board")
+@app.get("/home")
 async def index():
-    if os.path.isdir('../frontend/dist'):
+    if os.path.isdir('static'):
         return RedirectResponse("/static/index.html")
 
     return Index()
 
-app.mount("/static", StaticFiles(directory="../frontend/dist"), name="index")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 app.include_router(auth.router)

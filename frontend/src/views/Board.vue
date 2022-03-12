@@ -15,7 +15,9 @@
                     <tr v-for="week in weeks" :key="week">
                         <td v-for="week_day in week"
                             :key="week_day"
-                            :class="{ scheduled: isScheduled(week_day.format('YYYY-MM-DD'))}"
+                            :class="{ scheduled: isScheduled(week_day.format('YYYY-MM-DD')),
+                                      current: isCurrent(week_day)
+                                    }"
                         ><span>{{week_day.format('DD MMM')}}</span>
                             <br />
                             <p>
@@ -46,7 +48,7 @@
     <div v-if="openAddDayModal" class="modal">
       <p>Дата: {{addDayData.day.format('dd DD MMM')}}</p>
       <select v-model="addDayData.training_day_type" class="form-select form-select-lg mb-3"
-              aria-label="Тип треннировки">
+              aria-label="Тип тренировки">
         <option v-for="option in training_day_types" :value="option" :key="option.id">
           {{ option.name }}
         </option>
@@ -170,13 +172,13 @@ export default {
                 //  а также передавать больше дней
 
                 const subtypes = this.training_day_types[next_indx].details.subtypes;
-                for(let i in this.training_day_types) {
+                for(let i in subtypes) {
                     if (subtypes[i].id === before_last_training_day_subtype_id) {
                         prev_subtype_indx = i;
                         break;
                     }
                 }
-                if (prev_subtype_indx >= subtypes.length - 1) {
+                if (+prev_subtype_indx >= subtypes.length - 1) {
                     next_subtype_indx = +0;
                 } else {
                     next_subtype_indx = +prev_subtype_indx + 1;
@@ -214,6 +216,9 @@ export default {
             }
             this.openAddDayModal = true
         },
+        isCurrent(day){
+            return ru_moment().startOf("day").isSame(day);
+        },
         isScheduled(day){
             return !!this.schedule.dates[day];
         },
@@ -245,7 +250,7 @@ export default {
     created: async function () {
         try {
             await this.$store.commit('setRange', {
-                from_date: ru_moment().startOf('week').add(-7, 'day'),
+                from_date: ru_moment().startOf('week').add(-14, 'day'),
                 to_date: ru_moment().endOf('week').add(7, 'day'),
             });
             await Promise.all([
@@ -278,16 +283,16 @@ export default {
             week: getDaysRange(ru_moment().startOf('week'), ru_moment().endOf('week')),
             weeks: [
                 getDaysRange(
+                    ru_moment().startOf('week').add(-14, 'day'),
+                    ru_moment().endOf('week').add(-14, 'day')),
+                getDaysRange(
                     ru_moment().startOf('week').add(-7, 'day'),
                     ru_moment().endOf('week').add(-7, 'day')),
                 getDaysRange(
                     ru_moment().startOf('week'),
                     ru_moment().endOf('week')),
-                getDaysRange(
-                    ru_moment().startOf('week').add(7, 'day'),
-                    ru_moment().endOf('week').add(7, 'day')),
             ],
-            date_start: ru_moment().startOf('week').add(-7, 'day'),
+            date_start: ru_moment().startOf('week').add(-14, 'day'),
             date_end: ru_moment().endOf('week').add(7, 'day'),
             form: {
                 title: '',
@@ -410,7 +415,15 @@ table.cell .left-cell {
     width: 50%;
 }
 
-td.scheduled {
+#schedule > table > tbody > tr > td {
     background-color: #efefef;
+}
+
+#schedule > table > tbody > tr > td.scheduled {
+    background-color: white;
+}
+
+td.current {
+    color: red;
 }
 </style>

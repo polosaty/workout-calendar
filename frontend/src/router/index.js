@@ -7,7 +7,7 @@ import Board from '@/views/Board';
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'Home',
     component: Home
   },
@@ -27,7 +27,7 @@ const routes = [
     component: Profile
   },
   {
-    path: '/board',
+    path: '/',
     name: 'Board',
     component: Board
   }
