@@ -25,6 +25,7 @@ services:
       ASYNC_DB_URL: postgresql+asyncpg://user:password@db:5432/woc
     volumes:
       - ./backend:/app
+      - ./frontend/dist:/frontend/dist
     ports:
       - "127.0.0.1:8081:8000"
     depends_on:

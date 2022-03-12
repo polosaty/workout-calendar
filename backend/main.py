@@ -1,8 +1,12 @@
+import os
+
 import uvicorn
 from os import environ
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from fastapi.responses import RedirectResponse
 
 from src.routers import auth
 from src.routers import calendar
@@ -22,9 +26,14 @@ class Index(BaseModel):
     msg: str = 'HelloWorld'
 
 
-@app.get("/", response_model=Index)
+@app.get("/")
 async def index():
+    if os.path.isdir('../frontend/dist'):
+        return RedirectResponse("/static/index.html")
+
     return Index()
+
+app.mount("/static", StaticFiles(directory="../frontend/dist"), name="index")
 
 
 app.include_router(auth.router)
